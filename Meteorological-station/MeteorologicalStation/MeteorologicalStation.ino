@@ -7,8 +7,8 @@
 #include "time.h"
 
 // Wifi údaje
-const char * ssid = "kasparovi";
-const char * password = "mirda666";
+const char * ssid = "OndrosiPhone ";
+const char * password = "smaptest";
 
 // IFTTT údaje
 String server = "http://maker.ifttt.com";
@@ -30,11 +30,8 @@ Adafruit_BME280 bme; // I2C
 unsigned long delayTime;
 
 bool rain_bool = false;
+bool smoke_bool = false;
 int val_analogique;
-
-
-
-
 
 enum weather_type { 
   unknown     =  4,
@@ -110,16 +107,14 @@ void loop() {
   Serial.print(mq2AnalogVal);   /*Read value printed*/
   Serial.print("\t");
   Serial.print("\t");
-  if (mq2AnalogVal > 1800) {    /*if condition with threshold 1800*/
+  if (mq2AnalogVal > 400 && smoke_bool == false) {
+    smoke_bool = true;
+    sendNotify("Za%C4%8Dalo%20se%20topit!"); 
     Serial.println("Gas");  
-  } else {
+  } else if (mq2AnalogVal < 400 && smoke_bool == true) {
+    smoke_bool = false;
     Serial.println("No Gas");
   }
-//  Serial.print("Analog: ");
-//  Serial.print(rainAnalogVal);
-//  Serial.print("\t");
-//  Serial.print("Digital: ");
-//  Serial.println(rainDigitalVal);
   delay(200);
 
   String wx_text = "";
@@ -137,12 +132,11 @@ void loop() {
   if (digitalRead(rainDigital) == LOW && rain_bool == false) {
     rain_bool = true;
     Serial.println("Digital value : wet");
-    sendNotify("Začalo pršet!"); 
+    sendNotify("Za%C4%8Dalo%20pr%C5%A1et!"); 
     delay(10); 
   } else if (digitalRead(rainDigital) == HIGH && rain_bool == true) {
     rain_bool = false;
     Serial.println("Digital value : dry");
-    sendNotify("Přestalo pršet.");
     delay(10); 
   }
   
